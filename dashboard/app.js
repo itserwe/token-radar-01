@@ -183,11 +183,10 @@
 
   function readHash() {
     var hash = window.location.hash.replace(/^#/, '');
-    if (!hash) return;
     var params = new URLSearchParams(hash);
-    if (params.get('q')) state.q = params.get('q');
-    if (params.get('p')) state.selected = params.get('p');
-    if (params.get('category')) state.category = params.get('category');
+    state.q = params.get('q') || '';
+    state.category = params.get('category') || 'all';
+    state.selected = params.get('p') || null;
   }
   function writeHash() {
     var params = new URLSearchParams();
@@ -443,11 +442,13 @@
     app.appendChild(shell);
     app.setAttribute('aria-busy', 'false');
     if (!dialog.isConnected) app.appendChild(dialog);
+    if (!state.selected && dialog.open) dialog.close();
     if (state.selected) openDetail(state.selected);
   }
 
   readHash();
   render();
+  window.addEventListener('hashchange', function () { readHash(); render(); });
   window.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && dialog.open) dialog.close();
   });
